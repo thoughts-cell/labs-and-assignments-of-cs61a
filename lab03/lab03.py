@@ -91,7 +91,13 @@ def double_eights(n: int) -> bool:
     >>> check(SOURCE_FILE, 'double_eights', ['While', 'For', 'In', 'Str'])
     True
     """
-    "*** YOUR CODE HERE ***"
+     
+    last,second_last =  n % 10, n //10 %10
+    if last ==8 and second_last ==8:
+        return True
+    elif n <100 :
+        return False
+    return double_eights(n //10)
 
 
 def make_onion(f, g):
@@ -120,11 +126,11 @@ def make_onion(f, g):
     """
     def can_reach(x, y, limit):
         if limit < 0:
-            return ____
+            return False
         elif x == y:
-            return ____
+            return True
         else:
-            return can_reach(____, ____, limit - 1) or can_reach(____, ____, limit - 1)
+            return can_reach(f(x), y, limit - 1) or can_reach(g(x), y, limit - 1)
     return can_reach
 
 
@@ -142,7 +148,10 @@ def ten_pairs(n):
     >>> check(SOURCE_FILE, 'ten_pairs', ['While', 'For'])
     True
     """
-    "*** YOUR CODE HERE ***"
+    if n < 10:
+        return 0
+    else:
+        return ten_pairs(n//10) + count_digit(n//10, 10 - n % 10)
 
 
 def count_digit(n, digit):
@@ -155,5 +164,11 @@ def count_digit(n, digit):
     >>> check(SOURCE_FILE, 'count_digits', ['While', 'For'])
     True
     """
-    "*** YOUR CODE HERE ***"
+    if n == 0:
+        return 0
+    else:
+        if n%10 == digit:
+            return count_digit(n//10, digit) + 1
+        else:
+            return count_digit(n//10, digit)
 
