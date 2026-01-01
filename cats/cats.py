@@ -229,7 +229,20 @@ def furry_fixes(typed: str, source: str, limit: int) -> int:
     5
     """
     # BEGIN PROBLEM 6
-    assert False, 'Remove this line'
+    # Base Case: If the limit is negative, we've already exceeded the allowed differences.
+    if limit < 0:   
+        return 0 #because the +1s in the previous calls already made it > original limit
+    # Base Case: One string is empty, return the length of the other.
+    if not typed or not source:
+        return abs(len(typed) - len(source))
+    # Recursive Case: Characters match, move to the next character in both strings.
+    if typed[0] == source[0]:
+        return  furry_fixes(typed[1:], source[1:], limit)
+    else:
+        # Characters don't match, count this as a substitution and move to the next character in both strings.
+        return 1 + furry_fixes(typed[1:] ,source[1:],limit - 1)
+    
+
     # END PROBLEM 6
 
 
@@ -250,26 +263,27 @@ def minimum_mewtations(typed: str, source: str, limit: int) -> int:
     >>> minimum_mewtations("ckiteus", "kittens", big_limit) # ckiteus -> kiteus -> kitteus -> kittens
     3
     """
-    assert False, 'Remove this line'
-    if ___________: # Base cases should go here, you may add more base cases as needed.
-        # BEGIN
-        "*** YOUR CODE HERE ***"
-        # END
-    # Recursive cases should go below here
-    if ___________: # Feel free to remove or add additional cases
-        # BEGIN
-        "*** YOUR CODE HERE ***"
-        # END
+    
+    if limit < 0: # Base cases should go here, you may add more base cases as needed.
+
+        return 0
+    
+    if not typed or not source: # Feel free to remove or add additional cases
+    
+        return len(typed) + len (source)
+  
+    if typed[0] == source[0]:
+        return minimum_mewtations(typed[1:],source[1:], limit)
     else:
-        add = ... # Fill in these lines
-        remove = ...
-        substitute = ...
-        # BEGIN
-        "*** YOUR CODE HERE ***"
-        # END
+        add =  1 + minimum_mewtations(typed,source[1:], limit-1)    # add source[0] to the start of typed.
 
+        remove =  1+ minimum_mewtations(typed[1:],source, limit-1)  # remove typed[0].
 
-# Ignore the line below
+        substitute = 1 + minimum_mewtations(typed[1:],source[1:], limit-1) # substitute typed[0] to source[0].  
+         
+        return min (add, remove, substitute)
+
+ 
 minimum_mewtations = count(minimum_mewtations)
 
 

@@ -21,11 +21,10 @@ test = {
           >>> autocorrect("inside", ["idea", "insider"], first_diff, 0.5)
           'idea'
           >>> autocorrect("outside", ["idea", "insider"], first_diff, 0.5)
-          fb0a4fcea72813e3fdba19854ca5dfb6
-          # locked
+          'outside'
           """,
           'hidden': False,
-          'locked': True,
+          'locked': False,
           'multiline': False
         },
         {
