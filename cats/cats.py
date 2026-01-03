@@ -162,16 +162,10 @@ def memo_diff(diff_function):
     """A memoization function."""
     # cache = {}
 
-    # def memoized(typed, source, limit):
-    # if key in cache:
-    #     return cache[key]
-    # #if  not in cache ,calculate result using the original diff_function
-    # result = diff_function (typed ,source ,limit)
+      def memoized(typed, source, limit):
+   
 
-    # #store the result in cache for future use 
-    # cache[key] = result
-
-    # return memoized
+      return memoized
  
 def autocorrect(typed_word:str ,word_list:list[str] ,diff_function ,limit :int) -> str:
 
@@ -198,13 +192,13 @@ def autocorrect(typed_word:str ,word_list:list[str] ,diff_function ,limit :int) 
     
     if typed_word in word_list:
         return typed_word
-    best_match = min(word_list,key = lambda word :diff_function(typed_word, word, limit))
+    best_word = min(word_list,key = lambda word :diff_function(typed_word, word, limit))
     #calculate the actual difference  of the best match to check against the limit 
-    lowest_diff = diff_function(typed_word, best_match, limit)
-    if lowest_diff > limit:
-         return typed_word
-    else:
-        return best_match
+     
+    if diff_function(typed_word, best_word, limit) <= limit:
+
+        return best_word
+    return typed_word
     
 def furry_fixes(typed: str, source: str, limit: int) -> int:
     """A diff function for autocorrect that determines how many letters
@@ -283,17 +277,31 @@ def minimum_mewtations(typed: str, source: str, limit: int) -> int:
          
         return min (add, remove, substitute)
 
- 
+
+
 minimum_mewtations = count(minimum_mewtations)
 
 
 def final_diff(typed: str, source: str, limit: int) -> int:
     """A diff function that takes in a string TYPED, a string SOURCE, and a number LIMIT.
     If you implement this function, it will be used."""
-    assert False, "Remove this line to use your final_diff function."
+    if limit < 0:
+        return 0
+    if not typed or not source:
+        return len(typed) + len(source)
+    if type[0] == source[0]:
+        return final_diff(typed[1:], source[1:], limit) 
+    if len(typed)  > 1 and len(source) > 1 and typed[0] == source[1] and typed[1] == source[0]:
+        return 1 + final_diff(typed[2:], source[2:], limit - 1)
+    add_diff = 1 + final_diff(typed, source[1:], limit - 1)
+    remove_diff = 1 + final_diff(typed[1:], source, limit - 1)
+    substitute_diff = 1 + final_diff(typed[1:], source[1:], limit - 1)
+
+    return min(add_diff, remove_diff, substitute_diff)
 
 
-FINAL_DIFF_LIMIT = 6  # REPLACE THIS WITH YOUR LIMIT
+
+FINAL_DIFF_LIMIT = 2
 
 
 ###########
@@ -325,8 +333,18 @@ def report_progress(typed: list[str], source: list[str], user_id: int, upload) -
     0.2
     """
     # BEGIN PROBLEM 8
-    "*** YOUR CODE HERE ***"
-    # END PROBLEM 8
+    #count the number of words correctly match from start
+    correct_cnt = 0
+    for i in range (len(typed)):
+        if typed[i] == source[i]:
+            correct_cnt += 1
+        else:
+            break
+    progress = correct_cnt /len(source)
+    data = {'id' = user_id, 'progress': progress}
+    upload(data)
+    return progress
+    # END PROBLEM 8'
 
 
 def time_per_word(words: list[str], timestamps_per_player: list[list[int]]) -> dict:
@@ -347,10 +365,17 @@ def time_per_word(words: list[str], timestamps_per_player: list[list[int]]) -> d
     >>> result['times']
     [[6, 3, 6, 2], [10, 6, 1, 2]]
     """
-    tpp = timestamps_per_player  # A shorter name (for convenience)
+    tpp = timestamps_per_player  
     # BEGIN PROBLEM 9
-    times = []  # You may remove this line
-    # END PROBLEM 9
+    times =[]
+    # Iterate through each player's list of timestamps
+    for player_timestamps in tpp :
+        player_durations = []
+        for i in range(len(player_timestamps)-1):
+            duration =  player_timestamps[i+1]- player_timestamps[i]
+            player_durations.append (duration)
+        times.append(player_durations)
+     
     return {'words': words, 'times': times}
 
 
@@ -377,7 +402,22 @@ def fastest_words(words_and_times: dict) -> list[list[str]]:
     player_indices = range(len(times))  # contains an *index* for each player
     word_indices = range(len(words))    # contains an *index* for each word
     # BEGIN PROBLEM 10
-    "*** YOUR CODE HERE ***"
+    result  = [[]for _ in player_indices]
+    for word_idx in word_indices:
+        fastest_player = 0
+        min_time = time [0][word_idx]
+        for player_idx in player_indices:
+            current_time = times[player_idx][word_idx]
+            # Use '<' to ensure the player with the lower index wins ties
+            if current_time < min_time:
+                min_time = current_time
+                fastest_player = player_idx
+        
+        #   Add the actual word to the winning player's list
+        word_text = words[word_idx]
+        result[fastest_player].append(word_text)
+        
+    return result
     # END PROBLEM 10
 
 
