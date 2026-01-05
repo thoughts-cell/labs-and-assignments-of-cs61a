@@ -160,12 +160,18 @@ def memo(f):
 
 def memo_diff(diff_function):
     """A memoization function."""
-    # cache = {}
+    cache = {}
 
-      def memoized(typed, source, limit):
-   
-
-      return memoized
+    def memoized(typed, source, limit):
+        key = (typed, source, limit)
+        if key not in cache:
+            cache[key] = diff_function(typed, source, limit)
+             
+          
+        
+        return cache[key]    
+         
+    return memoized
  
 def autocorrect(typed_word:str ,word_list:list[str] ,diff_function ,limit :int) -> str:
 
@@ -257,29 +263,36 @@ def minimum_mewtations(typed: str, source: str, limit: int) -> int:
     >>> minimum_mewtations("ckiteus", "kittens", big_limit) # ckiteus -> kiteus -> kitteus -> kittens
     3
     """
-    
-    if limit < 0: # Base cases should go here, you may add more base cases as needed.
+   
+   
 
+    # Base case: if one string is empty, return the length of the other
+    if not typed or not source:
+        return len(typed) + len(source)
+    
+    # Optimization: if strings are identical, no edits needed
+    if typed == source:
         return 0
     
-    if not typed or not source: # Feel free to remove or add additional cases
-    
-        return len(typed) + len (source)
-  
+    # If first characters match, recurse on the rest
     if typed[0] == source[0]:
-        return minimum_mewtations(typed[1:],source[1:], limit)
+        return minimum_mewtations(typed[1:], source[1:], limit)
+    
     else:
-        add =  1 + minimum_mewtations(typed,source[1:], limit-1)    # add source[0] to the start of typed.
+        add = 1 + minimum_mewtations(typed, source[1:], limit - 1)
+        remove = 1 + minimum_mewtations(typed[1:], source, limit - 1)
+        substitute = 1 + minimum_mewtations(typed[1:], source[1:], limit - 1)
+        
+        # Manual min to avoid calling the built-in 'min' function if needed
+        
+        if add <= remove and add <= substitute:
+            return add
+        if remove <= add and remove <= substitute:
+            return remove
+        return substitute
 
-        remove =  1+ minimum_mewtations(typed[1:],source, limit-1)  # remove typed[0].
 
-        substitute = 1 + minimum_mewtations(typed[1:],source[1:], limit-1) # substitute typed[0] to source[0].  
-         
-        return min (add, remove, substitute)
-
-
-
-minimum_mewtations = count(minimum_mewtations)
+minimum_mewtations = memo_diff(minimum_mewtations)
 
 
 def final_diff(typed: str, source: str, limit: int) -> int:
@@ -341,7 +354,7 @@ def report_progress(typed: list[str], source: list[str], user_id: int, upload) -
         else:
             break
     progress = correct_cnt /len(source)
-    data = {'id' = user_id, 'progress': progress}
+    data = {'id' : user_id, 'progress': progress}
     upload(data)
     return progress
     # END PROBLEM 8'
@@ -405,7 +418,7 @@ def fastest_words(words_and_times: dict) -> list[list[str]]:
     result  = [[]for _ in player_indices]
     for word_idx in word_indices:
         fastest_player = 0
-        min_time = time [0][word_idx]
+        min_time = times [0][word_idx]
         for player_idx in player_indices:
             current_time = times[player_idx][word_idx]
             # Use '<' to ensure the player with the lower index wins ties
